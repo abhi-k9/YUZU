@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/wis31/OneDrive - The Ohio State University/_Academic_/SU22/CSE_Intro_DBMS/YUZU/Checkpoint4/YUZU_App/lib/sqlite-jdbc-3.32.3.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
