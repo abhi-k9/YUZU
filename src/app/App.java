@@ -170,7 +170,7 @@ public class App {
 					"	2) Update Record(s)\n" +	
 					"	3) Delete Record(s)\n" +
 					"	4) Search Record(s)\n" +
-					"   *) Exit\n"
+					"   	*) Exit\n"
 			);
 			
 			// Read integer input.
