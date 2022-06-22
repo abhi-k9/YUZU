@@ -6,6 +6,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/wis31/OneDrive - The Ohio State University/_Academic_/SU22/CSE_Intro_DBMS/YUZU/Checkpoint4/YUZU_App/lib/sqlite-jdbc-3.32.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/sqlite-jdbc-3.32.3.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
