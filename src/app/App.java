@@ -261,7 +261,18 @@ public class App {
 	}
 	
 	// Add given record strings to the database.
-	public static void addRecords(Connection conn, String tableName, TreeSet<String> recsToAdd) {	
+	public static void addRecords(Connection conn, String tableName, TreeSet<String> recsToAdd) {
+// 		System.out.println("Do you want to add data? (Y/N): ");
+// 		String option = in.nextLine(); //so need another 
+// 		System.out.println("option: " + option);
+// 		while (!option.equals("N")) {
+// 			System.out.print("Enter the data: ");
+// 			String data = in.nextLine();
+// 			s.add(data);
+// 			System.out.println("Do you want to add data? (Y/N): ");
+// 			option = in.nextLine();
+// 		}
+// 		System.out.println(s);
 	}
 	
 	public static void updateRecords() {
@@ -276,12 +287,20 @@ public class App {
 //		System.out.println("what data to update?: ");
 //		String element = in.nextLine();
 //		while (!sArray.isEmpty() && !option.equals("N")) {
-//			
-//			sArray.set(index, element);
-//			System.out.println("Do you want to update data? (Y/N): ");
-//			option = in.nextLine();
+//			System.out.println("Enter element to update?: ");
+// 			String element = in.nextLine();
+// 			int index = sArray.indexOf(element);
+// 			System.out.println("Enter to-be update element: ");
+// 			String updateE = in.nextLine();
+// 			sArray.set(index, updateE);
+// 			System.out.println("Do you want to update data? (Y/N): ");
+// 			option = in.nextLine();
 //		}
-//		System.out.println(sArray);
+//		if (sArray.isEmpty()) {
+// 			System.out.println("Set is empty, update option is unavailable");
+// 		} else {
+// 			System.out.println(sArray);
+// 		}
 //		
 //		System.out.print("How many records to add data?: (int)\n");
 //		int numRecords = in.nextInt();
@@ -303,15 +322,19 @@ public class App {
 	
 	public static void deleteRecords() { 
 	//		System.out.println("Do you want to add data? (Y/N): ");
-	//		String c = in.nextLine();
-	//		while (!c.equals("N")) {
+	//		String option = in.nextLine();
+	//		while (!s.isEmpty() && !option.equals("N")) {
 	//			System.out.print("Enter the data to be removed: ");
 	//			String data = in.nextLine();
 	//			s.remove(data);
 	//			System.out.print("Do you want to add data? (Y/N): ");
-	//			c = in.nextLine();
+	//			option = in.nextLine();
 	//		}
-	//		System.out.println(s);
+	//		if (s.isEmpty()) {
+// 				System.out.println("Set is empty, delete option is unavailable");
+// 			} else {
+// 				System.out.println(s);
+// 			}
 			
 		}
 	
