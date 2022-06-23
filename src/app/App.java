@@ -1,7 +1,7 @@
 package app;
-
-
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.Scanner;
 import java.util.Vector;
@@ -214,7 +214,7 @@ public class App {
 	}
 
 	// Prompt user to get the name of table to modify and check for its validity
-	public static String promptTableSelection(Connection conn) {
+public static String promptTableSelection(Connection conn) {
 		
 		System.out.println("Which table do you want to address?: (string)");
 		
@@ -245,43 +245,37 @@ public class App {
 		
 	}
 	
+	
 	// Collect input from user for the records to add.
-	public static TreeSet<String> promptAddRecords() {
+	public static Map<Integer, String> promptAddRecords() {
+		Scanner in = new Scanner(System.in);
 		
-		System.out.print("How many records to add data?: (int)\n");
-		int numRecords = in.nextInt();
+		System.out.print("How many records would you like to add?: (int)\n");
+		int numRecords = in.nextInt();	
 		
-		System.out.println("** Enter data for each record followed by enter key. **\n");
+		System.out.print("** Enter data for each record followed by enter key. **\n");
 		
-		TreeSet<String> recordStrings = new TreeSet<String>(); // TODO: should change to DB
-		for (int r = 0; r < numRecords; ++r ) {
+		Map<Integer, String> recordStrings = new HashMap<Integer, String>();
+		
+		for(int i = 0; i <= numRecords; i++) {
 			String data = in.nextLine();
-			recordStrings.add(data);
+			recordStrings.put(i, data);
 		}
-				
+		recordStrings.remove(0);
+
+		in.close();
+		
 		// Print data for debug if needed
-		logger.fine(recordStrings.toString());
+//		logger.fine(recordStrings.toString());
 		
 		
 		return recordStrings;
 	}
 	
-	// Add given record strings to the database.
-	public static void addRecords(Connection conn, String tableName, TreeSet<String> recsToAdd) {
-// 		System.out.println("Do you want to add data? (Y/N): ");
-// 		String option = in.nextLine(); //so need another 
-// 		System.out.println("option: " + option);
-// 		while (!option.equals("N")) {
-// 			System.out.print("Enter the data: ");
-// 			String data = in.nextLine();
-// 			s.add(data);
-// 			System.out.println("Do you want to add data? (Y/N): ");
-// 			option = in.nextLine();
-// 		}
-// 		System.out.println(s);
-	}
 	
-	public static void updateRecords() {
+	public static void updateRecords(Connection conn) {
+		Scanner in = new Scanner(System.in);
+		
 		
 //		sArray.addAll(s); //transfer set data to arrayList
 //		System.out.println(sArray);
@@ -318,48 +312,41 @@ public class App {
 //			recordStrings.add(data);
 //		}
 //		
+		in.close();
 //		
 //		// Print data for debug if needed
 //		logger.fine(recordStrings.toString());;
 	}
-	
-	public static String promptDeleteRecords() {
+		public static String promptDeleteRecords() {
 		
-		System.out.print("Please enter the condition for selecting records to delete.\n");
-		String delCondition = in.nextLine();
+			System.out.print("Please enter the condition for selecting records to delete.\n");
+			String delCondition = in.nextLine();
 		
-		return delCondition;
-	}
+			return delCondition;
+		}
 	
-	/** Delete records from given table that meet the selection conditions.
-	 * 
-	 * @param conn The database connection.
-	 * @param tableName Name of the table to query.
-	 * @param delCondition Record selection conditions.
-	 * @return Number of records deleted.
-	 */
-	public static int deleteRecords(Connection conn, String tableName, String delCondition) { 
-    	
-		int numRecordsAffected = 0;
-    	try {
-	    	String prepQuery = "DELETE FROM " + tableName + "\n" +
-					   		   "WHERE " + delCondition + " ;";
+		public static int deleteRecords(Connection conn, String tableName, String delCondition) { 
 	    	
-	    	PreparedStatement pStmt=  conn.prepareStatement(prepQuery);
-	    		    	
-	    	numRecordsAffected = pStmt.executeUpdate();
+			int numRecordsAffected = 0;
+	    	try {
+		    	String prepQuery = "DELETE FROM " + tableName + "\n" +
+						   		   "WHERE " + delCondition + " ;";
+		    	
+		    	PreparedStatement pStmt=  conn.prepareStatement(prepQuery);
+		    		    	
+		    	numRecordsAffected = pStmt.executeUpdate();
+		    	
+		    	System.out.println("Number of records deleted: " + numRecordsAffected);
+		    		    	
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println(e.getMessage());
+	    		System.exit(1); // TODO: Better error handling
+	    	}
 	    	
-	    	System.out.println("Number of records deleted: " + numRecordsAffected);
-	    		    	
-    	}
-    	catch (Exception e) {
-    		System.out.println(e.getMessage());
-    		System.exit(1); // TODO: Better error handling
-    	}
-    	
-    	return numRecordsAffected;
-			
-	}
+	    	return numRecordsAffected;
+				
+		}
 	
 	
 	public static void searchRecords() { 
@@ -373,44 +360,84 @@ public class App {
 //			System.out.print("Search the data? (Y/N): ");
 //			option = in.nextLine();
 //		}
-	
+//	
 	}
 	
 	
 	public static void main(String[] args) {
-
+		StringBuilder sb = new StringBuilder();
 		Connection conn = initializeDB("data/YUZU.db");
+		PreparedStatement stmt = null;
+		ResultSet rSet = null;
 		
+		
+		try {
+			
 		MainMenuOption selectedOption = promptMainMenu();
 		
 		switch (selectedOption) {
-		case ADD: {
+		
+		case ADD:
+			Scanner userInput = new Scanner(System.in);
 			String tName = promptTableSelection(conn);
-			TreeSet<String> recordsToAdd = promptAddRecords();
-			addRecords(conn, tName, recordsToAdd);
-			break;
-		}
+			String sql = "SELECT * FROM " + tName + ";"; //Creates builder query in order to access metadata
+			stmt = conn.prepareStatement(sql);
+			rSet = stmt.executeQuery(); //Query executes stmt 		
 			
+			for(int i = 0; i < rSet.getMetaData().getColumnCount(); i++) {
+			sb.append(rSet.getMetaData().getColumnName(i+1) + ",");
+			}
+			
+			sb.deleteCharAt(sb.length() - 1); //Removes comma on end of stringbuilder
+			String cNames = sb.toString();
+			sb = new StringBuilder();
+			Map<Integer, String> recordsToAdd = promptAddRecords();
+
+			PreparedStatement stmt2 = null;
+			ResultSet rSet2 = null;
+			for(int key: recordsToAdd.keySet()) {
+				String value = recordsToAdd.get(key);
+				System.out.println(value);
+				String sqlStatement = "INSERT INTO " + tName + "(" + cNames + ") " + "VALUES(" + value + ");";
+		 		stmt2 = conn.prepareStatement(sqlStatement);
+		 		
+				rSet2 = stmt2.executeQuery();
+		 		
+			}
+	 		
+	 		
+	 		System.out.println("ADD was SUCCESSFUL");
+	 			
+	 			//Test Inputs:
+	 		//100099,Andrew,J,Kelly,22,Male,abcde,fghij,513-687-5746,kelly15@yahoo.com
+	 		//100100,Mason,K,Dempsy,19,Male,qwerty,asdfgh,513-250-2692,dempsy@gmail.com
+	 		//100101,Jacob,B,Stuart,20,Male,cuandxl,aiawkgh,614-398-2247,stuuy@outlook.com
+	 		
+			
+			
+			break;
 		case UPDATE:
-			break;
 			
+			break;
 		case DELETE: {
-			String tName = promptTableSelection(conn);
+			String tableName = promptTableSelection(conn);
 			String delCondition = promptDeleteRecords();
-			deleteRecords(conn, tName, delCondition);
+			deleteRecords(conn, tableName, delCondition);
 			break;
 		}
-			
 		case SEARCH:
 			break;
-			
 		case REPORT:
 			break;
-			
 		case EXIT:
 			break;
 		}
 		
+			
+		} catch (Exception e){
+			System.out.println("ERROR");
+		}
+	
+		
 	}
-
 }
