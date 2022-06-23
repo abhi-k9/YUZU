@@ -247,7 +247,6 @@ public class App {
 	
 	// Collect input from user for the records to add.
 	public static TreeSet<String> promptAddRecords() {
-		Scanner in = new Scanner(System.in);
 		
 		System.out.print("How many records to add data?: (int)\n");
 		int numRecords = in.nextInt();
@@ -283,7 +282,6 @@ public class App {
 	}
 	
 	public static void updateRecords() {
-		Scanner in = new Scanner(System.in);
 		
 //		sArray.addAll(s); //transfer set data to arrayList
 //		System.out.println(sArray);
@@ -320,7 +318,6 @@ public class App {
 //			recordStrings.add(data);
 //		}
 //		
-		in.close();
 //		
 //		// Print data for debug if needed
 //		logger.fine(recordStrings.toString());;
