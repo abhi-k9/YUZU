@@ -326,24 +326,43 @@ public class App {
 //		logger.fine(recordStrings.toString());;
 	}
 	
+	public static String promptDeleteRecords() {
+		
+		System.out.print("Please enter the condition for selecting records to delete.\n");
+		String delCondition = in.nextLine();
+		
+		return delCondition;
+	}
 	
-	public static void deleteRecords() { 
-	//		System.out.println("Do you want to add data? (Y/N): ");
-	//		String option = in.nextLine();
-	//		while (!s.isEmpty() && !option.equals("N")) {
-	//			System.out.print("Enter the data to be removed: ");
-	//			String data = in.nextLine();
-	//			s.remove(data);
-	//			System.out.print("Do you want to add data? (Y/N): ");
-	//			option = in.nextLine();
-	//		}
-	//		if (s.isEmpty()) {
-// 				System.out.println("Set is empty, delete option is unavailable");
-// 			} else {
-// 				System.out.println(s);
-// 			}
+	/** Delete records from given table that meet the selection conditions.
+	 * 
+	 * @param conn The database connection.
+	 * @param tableName Name of the table to query.
+	 * @param delCondition Record selection conditions.
+	 * @return Number of records deleted.
+	 */
+	public static int deleteRecords(Connection conn, String tableName, String delCondition) { 
+    	
+		int numRecordsAffected = 0;
+    	try {
+	    	String prepQuery = "DELETE FROM " + tableName + "\n" +
+					   		   "WHERE " + delCondition + " ;";
+	    	
+	    	PreparedStatement pStmt=  conn.prepareStatement(prepQuery);
+	    		    	
+	    	numRecordsAffected = pStmt.executeUpdate();
+	    	
+	    	System.out.println("Number of records deleted: " + numRecordsAffected);
+	    		    	
+    	}
+    	catch (Exception e) {
+    		System.out.println(e.getMessage());
+    		System.exit(1); // TODO: Better error handling
+    	}
+    	
+    	return numRecordsAffected;
 			
-		}
+	}
 	
 	
 	public static void searchRecords() { 
