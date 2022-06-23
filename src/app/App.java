@@ -259,9 +259,7 @@ public class App {
 			String data = in.nextLine();
 			recordStrings.add(data);
 		}
-		
-		in.close();
-		
+				
 		// Print data for debug if needed
 		logger.fine(recordStrings.toString());
 		
