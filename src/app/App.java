@@ -220,16 +220,25 @@ public class App {
 		
 		try {
 			String tName = in.next();
-
+			in.nextLine(); // Consume rest of the line
+			
 	    	// Make sure table name provided exists in the database.
-	    	if (!getTableNames(conn).contains(tName)) {
+			HashSet<String> tableNames = getTableNames(conn);
+	    	if (!tableNames.contains(tName)) {
+	    		
 	    		System.out.println("X Given table name does not exist in the database. X"); // TODO: Better error handling.
+	    		System.out.println("Please select from: ");
+	    		tableNames.forEach( element -> {
+	    		    System.out.println(element);
+	    		});
+	    		
+	    		//TODO: Handle this part better.
 	    		System.exit(1);
 	    	}
 
 	    	return tName;
 		}
-		catch (Exception e){
+		catch (Exception e) {
 			System.out.println("X Error! X");
 			throw e; // TODO: Better exception handling.
 		}
