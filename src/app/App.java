@@ -387,20 +387,29 @@ public class App {
 		MainMenuOption selectedOption = promptMainMenu();
 		
 		switch (selectedOption) {
-		case ADD:
+		case ADD: {
 			String tName = promptTableSelection(conn);
 			TreeSet<String> recordsToAdd = promptAddRecords();
 			addRecords(conn, tName, recordsToAdd);
-			
 			break;
+		}
+			
 		case UPDATE:
 			break;
-		case DELETE:
+			
+		case DELETE: {
+			String tName = promptTableSelection(conn);
+			String delCondition = promptDeleteRecords();
+			deleteRecords(conn, tName, delCondition);
 			break;
+		}
+			
 		case SEARCH:
 			break;
+			
 		case REPORT:
 			break;
+			
 		case EXIT:
 			break;
 		}
