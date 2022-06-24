@@ -497,7 +497,7 @@ public class App {
 
 	public static void main(String[] args) {
 		Connection conn = initializeDB("data/YUZU.db");
-		UsefulReports(conn);
+		
 		try {
 
 			MainMenuOption selectedOption = promptMainMenu();
@@ -538,7 +538,9 @@ public class App {
 				break;
 			}
 			case REPORT:
+				UsefulReports(conn);
 				break;
+					
 			case EXIT:
 				System.out.println("Thank you! See you later.");
 				System.exit(0);
