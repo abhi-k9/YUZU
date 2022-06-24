@@ -49,7 +49,12 @@ public class App {
 		return conn;
 	}
 
-	// Get names of all tables in the database.
+	/**
+	 * Get names of all tables in the database.
+	 * 
+	 * @param conn Connection to database
+	 * @return a connection object to the designated database
+	 */
 	public static HashSet<String> getTableNames(Connection conn) {
 		HashSet<String> tableNames = new HashSet<String>();
 		;
@@ -68,7 +73,13 @@ public class App {
 		return tableNames;
 	}
 
-	// Get names of all columns in a table.
+	/**
+	 * Get names of all columns in a table.
+	 * 
+	 * @param conn Connection to database
+	 * @param tableName Name of the table
+	 * @return a TreeSet of the attributes
+	 */
 	public static TreeSet<String> getColumnNames(Connection conn, String tableName) throws Exception { // TODO:
 																										// Specialize
 																										// exception
@@ -123,7 +134,12 @@ public class App {
 		return colNames;
 	}
 
-	// Get type of data in a column for a query result set.
+	/**
+	 * Get type of data in a column for a query result set.
+	 * 
+	 * @param rst ResultSet used to acquire column types
+	 * @return a vector of the column types
+	 */
 	public static Vector<Integer> getColumnTypes(ResultSet rst) {
 		Vector<Integer> colTypes = new Vector<Integer>();
 
@@ -275,14 +291,14 @@ public class App {
 	public static Vector<String> promptAddRecords() {
 
 		System.out.print("How many records would you like to add?: (int)\n");
-		int numRecords = in.nextInt();
+		int numRecords = in.nextInt(); //User input
 		in.nextLine(); // Consume remaining input
 
 		System.out.print("** Enter data for each record followed by enter key. **\n");
 
 		Vector<String> recordStrings = new Vector<String>();
 
-		for (int i = 0; i < numRecords; ++i) {
+		for (int i = 0; i < numRecords; ++i) { //input vector with record data
 			String data = in.nextLine();
 			recordStrings.add(data);
 		}
@@ -290,9 +306,10 @@ public class App {
 		// Print data for debug if needed
 		logger.fine(recordStrings.toString());
 
-		return recordStrings;
+		return recordStrings; 
 	}
 
+	
 	public static int addRecords(Connection conn, String tableName, Vector<String> records) {
 
 		StringBuilder sqlRecsStr = new StringBuilder();
@@ -311,7 +328,7 @@ public class App {
 
 		int numRecordsAffected = 0;
 		try {
-			String prepQuery = "INSERT INTO " + tableName + "\n" + "VALUES " + sqlRecsStr + " ;";
+			String prepQuery = "INSERT INTO " + tableName + "\n" + "VALUES " + sqlRecsStr + " ;"; // Query statement formatted
 
 			PreparedStatement pStmt = conn.prepareStatement(prepQuery);
 
@@ -426,10 +443,61 @@ public class App {
 			System.exit(1); // TODO: Better error handling
 		}
 	}
+	
+	public static void UsefulReports(Connection conn) {
+    	/**
+    	 * 1.sale:Find total num of diff items purchased/provided by a patron
+    	 * 2.Pop.service/item:Find most pop.item/service in DB(one who had most purchases)
+    	 * 3.Pop.user:Find user with most purchase/service in DB
+    	 * 4.Pop.time:Find most pop.date for services in DB & num of instances/count
+    	 * 5.User&sale:Find users w/h highest amount of purchases, how many times, 
+    	 * avg dollar, total dollar
+    	 * 6.New report for Business
+    	 */
+    	System.out.println("-- End-User Menu --");
+		System.out.print(
+				"Select Following Report: \n" +
+				"	1) Patron Sale\n" +
+				"	2) Popular Service\n" +	
+				"	3) Popular User\n" +
+				"	4) Popular Date For Service\n" +
+				"	5) User and Sales\n" 
+		);
+		int choice = in.nextInt();
+		
+		switch (choice) {
+			case 1:
+				//Find total num of diff items purchased/provided by a patron	
+				System.out.println("Enter Patron ID: ");
+				int patronId = in.nextInt();
+				try {
+					String sql = "SELECT COUNT(DISTINCT Scooter_ID) FROM SCOOTER WHERE Charger_ID = " + patronId;
+					Statement stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery(sql);
+					printResultSet(rs);
+				} catch (SQLException e) {
+		            System.out.println(e.getMessage());
+		        }
+			case 2:
+				//Find most pop.item/service in DB(one who had most purchases)
+				try {
+					String sql = "SELECT Scooter_ID FROM RIDE GROUP BY Scooter_ID ORDER BY SUM(Fare) desc limit 1;";
+					Statement stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery(sql);
+					printResultSet(rs);
+				} catch (SQLException e) {
+		            System.out.println(e.getMessage());
+				}
+			default:
+				System.out.println("Invalid option.");
+				break;
+			}	
+    }
+
 
 	public static void main(String[] args) {
 		Connection conn = initializeDB("data/YUZU.db");
-
+		UsefulReports(conn);
 		try {
 
 			MainMenuOption selectedOption = promptMainMenu();
