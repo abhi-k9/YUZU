@@ -2,6 +2,7 @@ package app;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.Scanner;
@@ -146,6 +147,43 @@ public class App {
 		return colTypes;
 	}
 
+	public static void printResultSet(ResultSet rSet) {
+    	
+		TreeSet<String> colNames = getColumnNames(rSet);
+		
+		// Print column names.
+    	int numCols = colNames.size();
+    	
+    	Iterator<String> colNamesIter = colNames.iterator();
+
+    	for (int i = 1; i <= numCols; i++) {
+    		String value = colNamesIter.next();
+    		System.out.print(value);
+    		if (i < numCols) System.out.print(",  ");
+    	}
+    	
+		System.out.print("\n");
+
+		try {
+			while (rSet.next()) {
+				for (int i = 1; i <= numCols; i++) {
+
+					String columnValue = rSet.getString(i);
+					System.out.print(columnValue);
+
+					if (i < numCols)
+						System.out.print(",  ");
+				}
+
+				System.out.print("\n");
+			}
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.exit(1); // TODO: Better error handling
+		}
+	}
+	
 	// All possible main menu options.
 	enum MainMenuOption {
 		ADD, UPDATE, DELETE, SEARCH, REPORT, EXIT
