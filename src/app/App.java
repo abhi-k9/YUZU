@@ -1,9 +1,7 @@
 package app;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.TreeSet;
 import java.util.Scanner;
 import java.util.Vector;
@@ -148,20 +146,21 @@ public class App {
 	}
 
 	public static void printResultSet(ResultSet rSet) {
-    	
-		TreeSet<String> colNames = getColumnNames(rSet);
-		
-		// Print column names.
-    	int numCols = colNames.size();
-    	
-    	Iterator<String> colNamesIter = colNames.iterator();
 
-    	for (int i = 1; i <= numCols; i++) {
-    		String value = colNamesIter.next();
-    		System.out.print(value);
-    		if (i < numCols) System.out.print(",  ");
-    	}
-    	
+		TreeSet<String> colNames = getColumnNames(rSet);
+
+		// Print column names.
+		int numCols = colNames.size();
+
+		Iterator<String> colNamesIter = colNames.iterator();
+
+		for (int i = 1; i <= numCols; i++) {
+			String value = colNamesIter.next();
+			System.out.print(value);
+			if (i < numCols)
+				System.out.print(",  ");
+		}
+
 		System.out.print("\n");
 
 		try {
@@ -183,7 +182,7 @@ public class App {
 			System.exit(1); // TODO: Better error handling
 		}
 	}
-	
+
 	// All possible main menu options.
 	enum MainMenuOption {
 		ADD, UPDATE, DELETE, SEARCH, REPORT, EXIT
@@ -278,7 +277,7 @@ public class App {
 		System.out.print("How many records would you like to add?: (int)\n");
 		int numRecords = in.nextInt();
 		in.nextLine(); // Consume remaining input
-		
+
 		System.out.print("** Enter data for each record followed by enter key. **\n");
 
 		Vector<String> recordStrings = new Vector<String>();
@@ -298,25 +297,24 @@ public class App {
 
 		StringBuilder sqlRecsStr = new StringBuilder();
 		int numRecs = records.size();
-		
+
 		for (int i = 0; i < numRecs; ++i) {
 			sqlRecsStr.append("( ");
 			sqlRecsStr.append(records.get(i));
 			sqlRecsStr.append(" ),\n");
 		}
-		
+
 		int strSize = sqlRecsStr.length();
 		sqlRecsStr.delete(strSize - 2, strSize); // Remove comma and newline at end
-		
+
 		System.out.println(sqlRecsStr);
-		
+
 		int numRecordsAffected = 0;
 		try {
-			String prepQuery = "INSERT INTO " + tableName + "\n" +
-							   "VALUES " + sqlRecsStr + " ;";
+			String prepQuery = "INSERT INTO " + tableName + "\n" + "VALUES " + sqlRecsStr + " ;";
 
 			PreparedStatement pStmt = conn.prepareStatement(prepQuery);
-			
+
 			numRecordsAffected = pStmt.executeUpdate();
 
 			System.out.println("Number of records added: " + numRecordsAffected);
@@ -329,9 +327,9 @@ public class App {
 		return numRecordsAffected;
 
 	}
-	
+
 	public static Vector<String> promptUpdateRecords() {
-				
+
 		System.out.print("** Enter the attribute name and new value pairs for update. (attrName=newVal, ...) **\n");
 
 		Vector<String> recordStrings = new Vector<String>();
@@ -343,26 +341,25 @@ public class App {
 
 		String selCondition = in.nextLine();
 		recordStrings.add(selCondition);
-		
+
 		// Print data for debug if needed
 		logger.fine(recordStrings.toString());
 
 		return recordStrings;
 	}
-	
+
 	public static int updateRecords(Connection conn, String tableName, Vector<String> userInput) {
-		
+
 		String updateStr = userInput.get(0);
 		String selCondition = userInput.get(1);
 		int numRecordsAffected = 0;
-		
+
 		try {
-			String prepQuery = "UPDATE " + tableName + "\n" +
-							   "SET " + updateStr + "\n" +
-							   "WHERE " + selCondition + " ;";
+			String prepQuery = "UPDATE " + tableName + "\n" + "SET " + updateStr + "\n" + "WHERE " + selCondition
+					+ " ;";
 
 			PreparedStatement pStmt = conn.prepareStatement(prepQuery);
-			
+
 			numRecordsAffected = pStmt.executeUpdate();
 
 			System.out.println("Number of records updated: " + numRecordsAffected);
@@ -371,7 +368,7 @@ public class App {
 			System.out.println(e.getMessage());
 			System.exit(1); // TODO: Better error handling
 		}
-		
+
 		return numRecordsAffected;
 	}
 
@@ -411,12 +408,10 @@ public class App {
 
 		return searchCondition;
 	}
-	
+
 	public static void searchRecords(Connection conn, String tableName, String searchCondition) {
 		try {
-			String prepQuery = "SELECT *\n" + 
-							   "FROM " + tableName + "\n" +
-							   "WHERE " + searchCondition + " ;";
+			String prepQuery = "SELECT *\n" + "FROM " + tableName + "\n" + "WHERE " + searchCondition + " ;";
 
 			PreparedStatement pStmt = conn.prepareStatement(prepQuery);
 
