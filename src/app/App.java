@@ -370,18 +370,32 @@ public class App {
 
 	}
 
-	public static void searchRecords() {
-//		System.out.print("Search the data? (Y/N): ");
-//		option = in.nextLine();
-//		while (!option.equals("N")) {
-//			System.out.print("Enter the data to search: ");
-//			String data = in.nextLine();
-//			 System.out.println("Does the Set contains the data? "
-//                     + s.contains(data));
-//			System.out.print("Search the data? (Y/N): ");
-//			option = in.nextLine();
-//		}
-//	
+	public static String promptSearchRecords() {
+
+		System.out.print("Please enter the condition for selecting records.\n");
+		String searchCondition = in.nextLine();
+
+		return searchCondition;
+	}
+	
+	public static void searchRecords(Connection conn, String tableName, String searchCondition) {
+		try {
+			String prepQuery = "SELECT *\n" + 
+							   "FROM " + tableName + "\n" +
+							   "WHERE " + searchCondition + " ;";
+
+			PreparedStatement pStmt = conn.prepareStatement(prepQuery);
+
+			ResultSet rst = pStmt.executeQuery();
+
+			System.out.println("** RESULT: ** ");
+
+			printResultSet(rst);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.exit(1); // TODO: Better error handling
+		}
 	}
 
 	public static void main(String[] args) {
@@ -441,8 +455,12 @@ public class App {
 				deleteRecords(conn, tableName, delCondition);
 				break;
 			}
-			case SEARCH:
+			case SEARCH: {
+				String tableName = promptTableSelection(conn);
+				String selCondition = promptSearchRecords();
+				searchRecords(conn, tableName, selCondition);
 				break;
+			}
 			case REPORT:
 				break;
 			case EXIT:
