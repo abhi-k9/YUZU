@@ -273,32 +273,64 @@ public class App {
 	}
 
 	// Collect input from user for the records to add.
-	public static Map<Integer, String> promptAddRecords() {
-		Scanner in = new Scanner(System.in);
+	public static Vector<String> promptAddRecords() {
 
 		System.out.print("How many records would you like to add?: (int)\n");
 		int numRecords = in.nextInt();
-
+		in.nextLine(); // Consume remaining input
+		
 		System.out.print("** Enter data for each record followed by enter key. **\n");
 
-		Map<Integer, String> recordStrings = new HashMap<Integer, String>();
+		Vector<String> recordStrings = new Vector<String>();
 
-		for (int i = 0; i <= numRecords; i++) {
+		for (int i = 0; i < numRecords; ++i) {
 			String data = in.nextLine();
-			recordStrings.put(i, data);
+			recordStrings.add(data);
 		}
-		recordStrings.remove(0);
-
-		in.close();
 
 		// Print data for debug if needed
-//		logger.fine(recordStrings.toString());
+		logger.fine(recordStrings.toString());
 
 		return recordStrings;
 	}
 
+	public static int addRecords(Connection conn, String tableName, Vector<String> records) {
+
+		StringBuilder sqlRecsStr = new StringBuilder();
+		int numRecs = records.size();
+		
+		for (int i = 0; i < numRecs; ++i) {
+			sqlRecsStr.append("( ");
+			sqlRecsStr.append(records.get(i));
+			sqlRecsStr.append(" ),\n");
+		}
+		
+		int strSize = sqlRecsStr.length();
+		sqlRecsStr.delete(strSize - 2, strSize); // Remove comma and newline at end
+		
+		System.out.println(sqlRecsStr);
+		
+		int numRecordsAffected = 0;
+		try {
+			String prepQuery = "INSERT INTO " + tableName + "\n" +
+							   "VALUES " + sqlRecsStr + " ;";
+
+			PreparedStatement pStmt = conn.prepareStatement(prepQuery);
+			
+			numRecordsAffected = pStmt.executeUpdate();
+
+			System.out.println("Number of records added: " + numRecordsAffected);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.exit(1); // TODO: Better error handling
+		}
+
+		return numRecordsAffected;
+
+	}
+	
 	public static void updateRecords(Connection conn) {
-		Scanner in = new Scanner(System.in);
 
 //		sArray.addAll(s); //transfer set data to arrayList
 //		System.out.println(sArray);
@@ -335,7 +367,6 @@ public class App {
 //			recordStrings.add(data);
 //		}
 //		
-		in.close();
 //		
 //		// Print data for debug if needed
 //		logger.fine(recordStrings.toString());;
@@ -399,10 +430,7 @@ public class App {
 	}
 
 	public static void main(String[] args) {
-		StringBuilder sb = new StringBuilder();
 		Connection conn = initializeDB("data/YUZU.db");
-		PreparedStatement stmt = null;
-		ResultSet rSet = null;
 
 		try {
 
@@ -411,39 +439,14 @@ public class App {
 			switch (selectedOption) {
 
 			case ADD:
-				Scanner userInput = new Scanner(System.in);
 				String tName = promptTableSelection(conn);
-				String sql = "SELECT * FROM " + tName + ";"; // Creates builder query in order to access metadata
-				stmt = conn.prepareStatement(sql);
-				rSet = stmt.executeQuery(); // Query executes stmt
-
-				for (int i = 0; i < rSet.getMetaData().getColumnCount(); i++) {
-					sb.append(rSet.getMetaData().getColumnName(i + 1) + ",");
-				}
-
-				sb.deleteCharAt(sb.length() - 1); // Removes comma on end of stringbuilder
-				String cNames = sb.toString();
-				sb = new StringBuilder();
-				Map<Integer, String> recordsToAdd = promptAddRecords();
-
-				PreparedStatement stmt2 = null;
-				ResultSet rSet2 = null;
-				for (int key : recordsToAdd.keySet()) {
-					String value = recordsToAdd.get(key);
-					System.out.println(value);
-					String sqlStatement = "INSERT INTO " + tName + "(" + cNames + ") " + "VALUES(" + value + ");";
-					stmt2 = conn.prepareStatement(sqlStatement);
-
-					rSet2 = stmt2.executeQuery();
-
-				}
-
-				System.out.println("ADD was SUCCESSFUL");
+				Vector<String> records = promptAddRecords();
+				addRecords(conn, tName, records);
 
 				// Test Inputs:
-				// 100099,Andrew,J,Kelly,22,Male,abcde,fghij,513-687-5746,kelly15@yahoo.com
-				// 100100,Mason,K,Dempsy,19,Male,qwerty,asdfgh,513-250-2692,dempsy@gmail.com
-				// 100101,Jacob,B,Stuart,20,Male,cuandxl,aiawkgh,614-398-2247,stuuy@outlook.com
+				// 100099,'Andrew','J','Kelly',22,'Male','abcde','fghij','513-687-5746','kelly15@yahoo.com'
+				// 100100,'Mason','K','Dempsy',19,'Male','qwerty','asdfgh','513-250-2692','dempsy@gmail.com'
+				// 100101,'Jacob','B','Stuart',20,'Male','cuandxl','aiawkgh','614-398-2247','stuuy@outlook.com'
 
 				break;
 			case UPDATE:
