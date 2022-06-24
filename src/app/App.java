@@ -472,6 +472,8 @@ public class App {
 			case REPORT:
 				break;
 			case EXIT:
+				System.out.println("Thank you! See you later.");
+				System.exit(0);
 				break;
 			}
 
