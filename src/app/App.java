@@ -438,7 +438,7 @@ public class App {
 
 			switch (selectedOption) {
 
-			case ADD:
+			case ADD: {
 				String tName = promptTableSelection(conn);
 				Vector<String> records = promptAddRecords();
 				addRecords(conn, tName, records);
@@ -449,8 +449,7 @@ public class App {
 				// 100101,'Jacob','B','Stuart',20,'Male','cuandxl','aiawkgh','614-398-2247','stuuy@outlook.com'
 
 				break;
-			case UPDATE:
-
+			}
 				break;
 			case DELETE: {
 				String tableName = promptTableSelection(conn);
