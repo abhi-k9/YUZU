@@ -330,46 +330,49 @@ public class App {
 
 	}
 	
-	public static void updateRecords(Connection conn) {
+	public static Vector<String> promptUpdateRecords() {
+				
+		System.out.print("** Enter the attribute name and new value pairs for update. (attrName=newVal, ...) **\n");
 
-//		sArray.addAll(s); //transfer set data to arrayList
-//		System.out.println(sArray);
-//		System.out.print("Do you want to update data? (Y/N): ");
-//		option = in.nextLine();
-//		System.out.println("Select which element to update?: ");
-//		int index = in.nextInt();
-//		System.out.println("what data to update?: ");
-//		String element = in.nextLine();
-//		while (!sArray.isEmpty() && !option.equals("N")) {
-//			System.out.println("Enter element to update?: ");
-// 			String element = in.nextLine();
-// 			int index = sArray.indexOf(element);
-// 			System.out.println("Enter to-be update element: ");
-// 			String updateE = in.nextLine();
-// 			sArray.set(index, updateE);
-// 			System.out.println("Do you want to update data? (Y/N): ");
-// 			option = in.nextLine();
-//		}
-//		if (sArray.isEmpty()) {
-// 			System.out.println("Set is empty, update option is unavailable");
-// 		} else {
-// 			System.out.println(sArray);
-// 		}
-//		
-//		System.out.print("How many records to add data?: (int)\n");
-//		int numRecords = in.nextInt();
-//		
-//		System.out.println("** Enter data for each record followed by enter key. **\n");
-//		
-//		Set<String> recordStrings = new HashSet<String>(); // TODO: should change to DB
-//		for (int r = 0; r < numRecords; ++r ) {
-//			String data = in.nextLine();
-//			recordStrings.add(data);
-//		}
-//		
-//		
-//		// Print data for debug if needed
-//		logger.fine(recordStrings.toString());;
+		Vector<String> recordStrings = new Vector<String>();
+
+		String updatePairs = in.nextLine();
+		recordStrings.add(updatePairs);
+
+		System.out.print("** Enter the selection condition. **\n");
+
+		String selCondition = in.nextLine();
+		recordStrings.add(selCondition);
+		
+		// Print data for debug if needed
+		logger.fine(recordStrings.toString());
+
+		return recordStrings;
+	}
+	
+	public static int updateRecords(Connection conn, String tableName, Vector<String> userInput) {
+		
+		String updateStr = userInput.get(0);
+		String selCondition = userInput.get(1);
+		int numRecordsAffected = 0;
+		
+		try {
+			String prepQuery = "UPDATE " + tableName + "\n" +
+							   "SET " + updateStr + "\n" +
+							   "WHERE " + selCondition + " ;";
+
+			PreparedStatement pStmt = conn.prepareStatement(prepQuery);
+			
+			numRecordsAffected = pStmt.executeUpdate();
+
+			System.out.println("Number of records updated: " + numRecordsAffected);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.exit(1); // TODO: Better error handling
+		}
+		
+		return numRecordsAffected;
 	}
 
 	public static String promptDeleteRecords() {
@@ -450,7 +453,15 @@ public class App {
 
 				break;
 			}
+			case UPDATE: {
+				String tName = promptTableSelection(conn);
+				Vector<String> userInput = promptUpdateRecords();
+				updateRecords(conn, tName, userInput);
 				break;
+				// Test Inputs:
+				// Age = 25
+				// ID = 100040
+			}
 			case DELETE: {
 				String tableName = promptTableSelection(conn);
 				String delCondition = promptDeleteRecords();
