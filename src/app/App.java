@@ -214,7 +214,7 @@ public class App {
 			// Show main menu
 			System.out.println("-- Main Menu --");
 			System.out.println("Select an option: (int)\n" + "	1) Add Record(s)\n" + "	2) Update Record(s)\n"
-					+ "	3) Delete Record(s)\n" + "	4) Search Record(s)\n" + "   	*) Exit\n");
+					+ "	3) Delete Record(s)\n" + "	4) Search Record(s)\n" + "	5) Report(s)\n" + "   	*) Exit\n");
 
 			// Read integer input.
 			try {
@@ -247,7 +247,11 @@ public class App {
 		case 4:
 			return MainMenuOption.SEARCH;
 		// break;
-
+			
+		case 5:
+			return MainMenuOption.REPORT;
+		// break;
+			
 		default:
 			return MainMenuOption.EXIT;
 		// break;
@@ -445,15 +449,6 @@ public class App {
 	}
 	
 	public static void UsefulReports(Connection conn) {
-    	/**
-    	 * 1.sale:Find total num of diff items purchased/provided by a patron
-    	 * 2.Pop.service/item:Find most pop.item/service in DB(one who had most purchases)
-    	 * 3.Pop.user:Find user with most purchase/service in DB
-    	 * 4.Pop.time:Find most pop.date for services in DB & num of instances/count
-    	 * 5.User&sale:Find users w/h highest amount of purchases, how many times, 
-    	 * avg dollar, total dollar
-    	 * 6.New report for Business
-    	 */
     	System.out.println("-- End-User Menu --");
 		System.out.print(
 				"Select Following Report: \n" +
@@ -461,7 +456,8 @@ public class App {
 				"	2) Popular Service\n" +	
 				"	3) Popular User\n" +
 				"	4) Popular Date For Service\n" +
-				"	5) User and Sales\n" 
+				"	5) User and Sales\n" +
+				"	6) Popular Region"
 		);
 		int choice = in.nextInt();
 		
@@ -478,6 +474,7 @@ public class App {
 				} catch (SQLException e) {
 		            System.out.println(e.getMessage());
 		        }
+				break;
 			case 2:
 				//Find most pop.item/service in DB(one who had most purchases)
 				try {
@@ -488,10 +485,73 @@ public class App {
 				} catch (SQLException e) {
 		            System.out.println(e.getMessage());
 				}
-			default:
-				System.out.println("Invalid option.");
 				break;
-			}	
+			case 3:
+				//Pop.user:Find user with most purchase/service in DB
+				try {
+					String sql = "SELECT P.ID, MAX(R.Fare), P.Username FROM PERSON P, RIDE R\r\n"
+							+ "WHERE P.ID = R.Customer_ID\r\n"
+							+ "GROUP BY P.Username \r\n"
+							+ "ORDER BY MAX(R.Fare) desc\r\n"
+							+ "limit 1;";
+					Statement stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery(sql);
+					printResultSet(rs);
+				} catch (SQLException e) {
+		            System.out.println(e.getMessage());
+				}
+				break;
+			case 4: 
+				//Pop.time:Find most pop.date for services in DB & num of instances/count
+				try {
+					String sql = "SELECT Date\r\n"
+							+ "FROM RIDE\r\n"
+							+ "GROUP BY Date \r\n"
+							+ "ORDER BY COUNT(Date) desc\r\n"
+							+ "limit 1;";
+					Statement stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery(sql);
+					printResultSet(rs);
+				} catch (SQLException e) {
+		            System.out.println(e.getMessage());
+				}
+				break;
+			case 5: 
+				//User&sale:Find users w/h highest amount of purchases, how many times, avg dollar, total dollar
+				try {
+					String sql1 = "SELECT P.Username, COUNT(R.Fare)\r\n"
+							+ "FROM PERSON P, RIDE R\r\n"
+							+ "WHERE P.ID = R.Customer_ID\r\n"
+							+ "GROUP BY P.Username\r\n"
+							+ "ORDER BY MAX(R.Fare) desc\r\n"
+							+ "limit 1;";
+					Statement stmt1 = conn.createStatement();
+					ResultSet rs1 = stmt1.executeQuery(sql1);
+					printResultSet(rs1);
+					String sql2 = "SELECT AVG(Fare), SUM(Fare) FROM RIDE";
+					Statement stmt2= conn.createStatement();
+					ResultSet rs2 = stmt2.executeQuery(sql2);
+					printResultSet(rs2);
+				} catch (SQLException e) {
+	            System.out.println(e.getMessage());
+	            }
+				break;
+			case 6:
+				//Popular region: Find most pop.region most scooters are used. 
+				try {
+					String sql = "SELECT Region_ID\r\n"
+							+ "FROM SCOOTER\r\n"
+							+ "GROUP BY Region_ID\r\n"
+							+ "ORDER BY COUNT(Region_ID) desc\r\n"
+							+ "limit 1;";
+					Statement stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery(sql);
+					printResultSet(rs);
+				} catch (SQLException e) {
+		            System.out.println(e.getMessage());
+				}
+				break;
+		}
     }
 
 
