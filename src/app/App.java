@@ -450,7 +450,7 @@ public class App {
 	
 	public static void UsefulReports(Connection conn) {
     	System.out.println("-- End-User Menu --");
-		System.out.print(
+		System.out.println(
 				"Select Following Report: \n" +
 				"	1) Patron Sale\n" +
 				"	2) Popular Service\n" +	
@@ -464,12 +464,15 @@ public class App {
 		switch (choice) {
 			case 1:
 				//Find total num of diff items purchased/provided by a patron	
-				System.out.println("Enter Patron ID: ");
-				int patronId = in.nextInt();
+				System.out.println("Enter Customer ID: ");
+				int CustomerId = in.nextInt();
 				try {
-					String sql = "SELECT COUNT(DISTINCT Scooter_ID) FROM SCOOTER WHERE Charger_ID = " + patronId;
-					Statement stmt = conn.createStatement();
-					ResultSet rs = stmt.executeQuery(sql);
+					String query = "SELECT COUNT(DISTINCT S.Scooter_ID) \r\n"
+							+ "FROM SCOOTER S, PERSON P, RIDE R\r\n"
+							+ "WHERE S.Scooter_ID = R.Scooter_ID AND P.ID = R.Customer_ID AND Customer_ID = ?";
+					PreparedStatement stmt = conn.prepareStatement(query);
+					stmt.setInt(1, CustomerId);
+					ResultSet rs = stmt.executeQuery();
 					printResultSet(rs);
 				} catch (SQLException e) {
 		            System.out.println(e.getMessage());
@@ -478,9 +481,10 @@ public class App {
 			case 2:
 				//Find most pop.item/service in DB(one who had most purchases)
 				try {
-					String sql = "SELECT Scooter_ID FROM RIDE GROUP BY Scooter_ID ORDER BY SUM(Fare) desc limit 1;";
-					Statement stmt = conn.createStatement();
-					ResultSet rs = stmt.executeQuery(sql);
+					String query = "SELECT Scooter_ID FROM RIDE GROUP BY Scooter_ID "
+							+ "ORDER BY SUM(Fare) desc, COUNT(Scooter_ID) desc limit 1;";
+					PreparedStatement stmt = conn.prepareStatement(query);
+					ResultSet rs = stmt.executeQuery();
 					printResultSet(rs);
 				} catch (SQLException e) {
 		            System.out.println(e.getMessage());
@@ -489,13 +493,13 @@ public class App {
 			case 3:
 				//Pop.user:Find user with most purchase/service in DB
 				try {
-					String sql = "SELECT P.ID, MAX(R.Fare), P.Username FROM PERSON P, RIDE R\r\n"
+					String query = "SELECT P.ID, SUM(R.Fare), P.Username FROM PERSON P, RIDE R\r\n"
 							+ "WHERE P.ID = R.Customer_ID\r\n"
 							+ "GROUP BY P.Username \r\n"
-							+ "ORDER BY MAX(R.Fare) desc\r\n"
+							+ "ORDER BY SUM(R.Fare) desc\r\n"
 							+ "limit 1;";
-					Statement stmt = conn.createStatement();
-					ResultSet rs = stmt.executeQuery(sql);
+					PreparedStatement stmt = conn.prepareStatement(query);
+					ResultSet rs = stmt.executeQuery();
 					printResultSet(rs);
 				} catch (SQLException e) {
 		            System.out.println(e.getMessage());
@@ -504,13 +508,13 @@ public class App {
 			case 4: 
 				//Pop.time:Find most pop.date for services in DB & num of instances/count
 				try {
-					String sql = "SELECT Date\r\n"
+					String query = "SELECT Date\r\n"
 							+ "FROM RIDE\r\n"
 							+ "GROUP BY Date \r\n"
 							+ "ORDER BY COUNT(Date) desc\r\n"
 							+ "limit 1;";
-					Statement stmt = conn.createStatement();
-					ResultSet rs = stmt.executeQuery(sql);
+					PreparedStatement stmt = conn.prepareStatement(query);
+					ResultSet rs = stmt.executeQuery();
 					printResultSet(rs);
 				} catch (SQLException e) {
 		            System.out.println(e.getMessage());
@@ -519,18 +523,18 @@ public class App {
 			case 5: 
 				//User&sale:Find users w/h highest amount of purchases, how many times, avg dollar, total dollar
 				try {
-					String sql1 = "SELECT P.Username, COUNT(R.Fare)\r\n"
+					String query1 = "SELECT COUNT(R.Fare), P.Username\r\n"
 							+ "FROM PERSON P, RIDE R\r\n"
 							+ "WHERE P.ID = R.Customer_ID\r\n"
 							+ "GROUP BY P.Username\r\n"
 							+ "ORDER BY MAX(R.Fare) desc\r\n"
 							+ "limit 1;";
-					Statement stmt1 = conn.createStatement();
-					ResultSet rs1 = stmt1.executeQuery(sql1);
+					PreparedStatement stmt1 = conn.prepareStatement(query1);
+					ResultSet rs1 = stmt1.executeQuery();
 					printResultSet(rs1);
-					String sql2 = "SELECT AVG(Fare), SUM(Fare) FROM RIDE";
-					Statement stmt2= conn.createStatement();
-					ResultSet rs2 = stmt2.executeQuery(sql2);
+					String query2 = "SELECT AVG(Fare), SUM(Fare) FROM RIDE";
+					PreparedStatement stmt2 = conn.prepareStatement(query2);
+					ResultSet rs2 = stmt2.executeQuery();
 					printResultSet(rs2);
 				} catch (SQLException e) {
 	            System.out.println(e.getMessage());
@@ -539,13 +543,13 @@ public class App {
 			case 6:
 				//Popular region: Find most pop.region most scooters are used. 
 				try {
-					String sql = "SELECT Region_ID\r\n"
+					String query = "SELECT Region_ID\r\n"
 							+ "FROM SCOOTER\r\n"
 							+ "GROUP BY Region_ID\r\n"
 							+ "ORDER BY COUNT(Region_ID) desc\r\n"
 							+ "limit 1;";
-					Statement stmt = conn.createStatement();
-					ResultSet rs = stmt.executeQuery(sql);
+					PreparedStatement stmt = conn.prepareStatement(query);
+					ResultSet rs = stmt.executeQuery();
 					printResultSet(rs);
 				} catch (SQLException e) {
 		            System.out.println(e.getMessage());
