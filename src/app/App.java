@@ -560,60 +560,64 @@ public class App {
 
 
 	public static void main(String[] args) {
-		Connection conn = initializeDB("data/YUZU.db");
 		
-		try {
-
-			MainMenuOption selectedOption = promptMainMenu();
-
-			switch (selectedOption) {
-
-			case ADD: {
-				String tName = promptTableSelection(conn);
-				Vector<String> records = promptAddRecords();
-				addRecords(conn, tName, records);
-
-				// Test Inputs:
-				// 100099,'Andrew','J','Kelly',22,'Male','abcde','fghij','513-687-5746','kelly15@yahoo.com'
-				// 100100,'Mason','K','Dempsy',19,'Male','qwerty','asdfgh','513-250-2692','dempsy@gmail.com'
-				// 100101,'Jacob','B','Stuart',20,'Male','cuandxl','aiawkgh','614-398-2247','stuuy@outlook.com'
-
-				break;
-			}
-			case UPDATE: {
-				String tName = promptTableSelection(conn);
-				Vector<String> userInput = promptUpdateRecords();
-				updateRecords(conn, tName, userInput);
-				break;
-				// Test Inputs:
-				// Age = 25
-				// ID = 100040
-			}
-			case DELETE: {
-				String tableName = promptTableSelection(conn);
-				String delCondition = promptDeleteRecords();
-				deleteRecords(conn, tableName, delCondition);
-				break;
-			}
-			case SEARCH: {
-				String tableName = promptTableSelection(conn);
-				String selCondition = promptSearchRecords();
-				searchRecords(conn, tableName, selCondition);
-				break;
-			}
-			case REPORT:
-				UsefulReports(conn);
-				break;
-					
-			case EXIT:
-				System.out.println("Thank you! See you later.");
-				System.exit(0);
-				break;
-			}
-
-		} catch (Exception e) {
-			System.out.println("ERROR");
+		
+		
+			try {
+				Connection conn = initializeDB("data/YUZU.db");
+			
+				String choice = "Y";
+				Scanner in = new Scanner(System.in);
+				while (choice.equals("Y")) {
+					MainMenuOption selectedOption = promptMainMenu();
+					switch (selectedOption) {
+						case ADD: 
+							String tName = promptTableSelection(conn);
+							Vector<String> records = promptAddRecords();
+							addRecords(conn, tName, records);
+		
+							// Test Inputs:
+							// 100099,'Andrew','J','Kelly',22,'Male','abcde','fghij','513-687-5746','kelly15@yahoo.com'
+							// 100100,'Mason','K','Dempsy',19,'Male','qwerty','asdfgh','513-250-2692','dempsy@gmail.com'
+							// 100101,'Jacob','B','Stuart',20,'Male','cuandxl','aiawkgh','614-398-2247','stuuy@outlook.com'
+							break;
+						
+						case UPDATE: 
+							tName = promptTableSelection(conn);
+							Vector<String> userInput = promptUpdateRecords();
+							updateRecords(conn, tName, userInput);
+							break;
+							// Test Inputs:
+							// Age = 25
+							// ID = 100040
+						
+						case DELETE: 
+							String tableName = promptTableSelection(conn);
+							String delCondition = promptDeleteRecords();
+							deleteRecords(conn, tableName, delCondition);
+							break;
+						
+						case SEARCH: 
+							tableName = promptTableSelection(conn);
+							String selCondition = promptSearchRecords();
+							searchRecords(conn, tableName, selCondition);
+							break;
+						
+						case REPORT:
+							UsefulReports(conn);
+							break;
+								
+						case EXIT:
+							System.out.println("Thank you! See you later.");
+							System.exit(0);
+							break;
+					}
+					System.out.println("Choose Option again or quit: (Y/Q) ");
+					choice = in.nextLine();
+				
+				}} catch (Exception e) {
+					System.out.println("ERROR");
+				}
 		}
-
+	
 	}
-}
